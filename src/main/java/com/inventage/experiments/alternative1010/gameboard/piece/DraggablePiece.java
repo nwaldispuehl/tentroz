@@ -12,6 +12,8 @@ import java.util.List;
  */
 public abstract class DraggablePiece extends Group {
 
+  private static final int ROTATION_DEGREES = 90;
+
   protected static final int GRID_SIZE = GameGrid.FIELD_SIZE + GameGrid.SPACE;
 
   double originalSceneX, originalSceneY;
@@ -22,13 +24,16 @@ public abstract class DraggablePiece extends Group {
     for (Field f : fields) {
       f.setColor(color);
     }
-    makeDraggable();
   }
 
-  private void makeDraggable() {
+  public void rotate() {
+    setRotate((getRotate() + 90) % 360);
+  }
+
+  public void setDraggable() {
 
     setOnDragDetected(event -> {
-      setManaged(false);
+//      setManaged(false);
       startFullDrag();
 
 

@@ -1,17 +1,17 @@
 package com.inventage.experiments.alternative1010.gameboard.piece;
 
 import com.inventage.experiments.alternative1010.gameboard.Field;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.inventage.experiments.alternative1010.gameboard.GameGrid.FIELD_SIZE;
+import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.DOUBLE_CHUNK;
 
 /**
- * Created by nw on 26.08.15.
+ * 2 x 2 piece.
  */
-public class FourBlock extends DraggablePiece {
+public class DoubleChunk extends DraggablePiece {
 
   private static List<Field> fields = new ArrayList<>();
 
@@ -22,7 +22,7 @@ public class FourBlock extends DraggablePiece {
     fields.add(new Field(FIELD_SIZE, GRID_SIZE, GRID_SIZE));
   }
 
-  public FourBlock() {
-    super(Color.GREEN, fields);
+  public DoubleChunk() {
+    super(DOUBLE_CHUNK, fields);
   }
 }

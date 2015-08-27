@@ -6,20 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.inventage.experiments.alternative1010.gameboard.GameGrid.FIELD_SIZE;
-import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.SINGLE;
+import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.TRIPLE_BAR;
 
 /**
- * The 1 x 1 block.
+ * 1 x 3 piece.
  */
-public class SingleBlock extends DraggablePiece {
+public class TripleBar extends DraggablePiece {
 
   private static List<Field> fields = new ArrayList<>();
 
   static {
     fields.add(new Field(FIELD_SIZE, 0, 0));
+    fields.add(new Field(FIELD_SIZE, 0, GRID_SIZE));
+    fields.add(new Field(FIELD_SIZE, 0, 2 * GRID_SIZE));
   }
 
-  public SingleBlock() {
-    super(SINGLE, fields);
+  public TripleBar() {
+    super(TRIPLE_BAR, fields);
   }
 }

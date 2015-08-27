@@ -15,8 +15,8 @@ public class Field extends Rectangle {
     setY(y);
     setWidth(size);
     setHeight(size);
-    setArcWidth(size/10);
-    setArcHeight(size/10);
+    setArcWidth(size/8);
+    setArcHeight(size/8);
     setFill(Color.LIGHTGRAY);
   }
 

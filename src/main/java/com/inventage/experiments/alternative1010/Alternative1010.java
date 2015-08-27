@@ -20,7 +20,7 @@ public class Alternative1010 extends Application {
 
   private Scene createScene() {
     Pane root = new Pane();
-    root.getChildren().add(new GameBoard(800, 800));
+    root.getChildren().add(new GameBoard(920, 800));
     Scene scene = new Scene(root);
     return scene;
   }

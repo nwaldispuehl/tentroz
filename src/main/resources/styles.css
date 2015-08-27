@@ -1,3 +1,16 @@
+*{
+    /* Remove later... */
+    -fx-border-color:dodgerblue;
+}
+
 #score {
-    -fx-font-size: 16;
+    -fx-font-size: 32;
+}
+
+#nextBlockPaneContainer {
+
+}
+
+#nextBlockPane {
+
 }
