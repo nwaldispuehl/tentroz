@@ -1,0 +1,19 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+   mavenCentral()
+}
+
+
+
+jar {
+    manifest.attributes provider: 'gradle'
+    mainClassName = "com.inventage.experiments.alternative1010.Alternative1010"
+}
+
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '15.0'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile 'junit:junit:4.11'
+}
