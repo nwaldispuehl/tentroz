@@ -54,8 +54,13 @@ public class PieceLibrary implements PieceProvider {
       throw new RuntimeException(e);
     }
 
-    piece.setRotate(rotationAngles[random.nextInt(rotationAngles.length)]);
+    int rotations = random.nextInt(rotationAngles.length);
+    for (int i = 0; i < rotations; i++) {
+      piece.rotate();
+    }
+
     System.out.println(piece);
+
     return piece;
   }
 

@@ -4,7 +4,8 @@
 }
 
 #score {
-    -fx-font-size: 32;
+    -fx-font-size: 42;
+    -fx-font-weight: bolder;
 }
 
 #nextBlockPaneContainer {

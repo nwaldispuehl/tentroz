@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 public class ColorPalette {
 
   public static final Color SINGLE = Color.PURPLE;
-  public static final Color DOUBLE_BAR = Color.LIGHTGOLDENRODYELLOW;
+  public static final Color DOUBLE_BAR = Color.ORANGE;
   public static final Color TRIPLE_BAR = Color.ORANGERED;
   public static final Color QUADRUPLE_BAR = Color.LIGHTPINK;
   public static final Color QUINTUPLE_BAR = Color.INDIANRED;
