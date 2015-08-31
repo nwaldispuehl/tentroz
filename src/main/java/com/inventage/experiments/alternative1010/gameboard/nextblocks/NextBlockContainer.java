@@ -64,7 +64,7 @@ public class NextBlockContainer extends BorderPane {
     nextBlocksPane.getChildren().get(0).setOpacity(1);
     DraggablePiece piece = (DraggablePiece) ((BorderPane) nextBlocksPane.getChildren().get(0)).getCenter();
     piece.setDraggable();
-    piece.setOnMouseClicked(event -> piece.rotate());
+    piece.setRotatable();
   }
 
   private void makeFollowingItemsTransparent() {

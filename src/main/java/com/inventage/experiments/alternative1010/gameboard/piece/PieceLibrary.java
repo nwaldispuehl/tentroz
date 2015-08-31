@@ -59,7 +59,7 @@ public class PieceLibrary implements PieceProvider {
       piece.rotate();
     }
 
-    System.out.println(piece);
+    System.out.println(piece + "Rotations: " + rotationAngles[rotations]);
 
     return piece;
   }

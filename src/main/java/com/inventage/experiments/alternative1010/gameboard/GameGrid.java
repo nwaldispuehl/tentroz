@@ -5,6 +5,7 @@ import javafx.scene.Group;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 import java.util.List;
@@ -46,32 +47,67 @@ public class GameGrid extends Group {
     });
 
     setOnDragOver(event -> {
-      event.acceptTransferModes(TransferMode.MOVE);
+      DraggablePiece piece = retrievePieceFrom(event);
+      if (allFieldsInGridFor(piece, event) && allFieldsFreeFor(piece, event)) {
+        event.acceptTransferModes(TransferMode.MOVE);
+      }
+
       event.consume();
     });
 
     setOnDragDropped(event -> {
       DraggablePiece piece = retrievePieceFrom(event);
-
-      Tuple<Integer, Integer> gridPosition = getGridPositionFor(event.getX(), event.getY());
-      System.out.println(piece + " on " + event.getX() + "/" + event.getY() + "(" + (gridPosition.first + 1) + "," + (gridPosition.second + 1) + ")");
-      System.out.println("dropped");
-
-      for (Field f : getFieldsFor(piece, event)) {
-        if (f != null) {
-          f.setColor(Color.RED);
-        }
-      }
-
-      gameBoard.cycleItem();
+      storeIntoFields(piece, event);
+      gameBoard.dropItem(piece);
+      countPointsFor(piece);
+      checkForCompleteRows();
     });
 
     setOnMouseDragOver(event -> {
       event.consume();
       System.out.println("mouse over");
     });
-
   }
+
+
+
+  private void storeIntoFields(DraggablePiece piece, DragEvent dragEvent) {
+    for (Tuple<Integer, Integer> t : getPositionsFor(piece, dragEvent)) {
+      Field field = createFieldWith(piece.getColor(), t.first, t.second);
+      fields[t.first][t.second] = field;
+      getChildren().add(field);
+      field.toFront();
+    }
+  }
+
+  private Field createFieldWith(Paint color, int col, int row) {
+    Field field = new Field(FIELD_SIZE, col * (FIELD_SIZE + SPACE), row * (FIELD_SIZE + SPACE));
+    field.setColor(color);
+    return field;
+  }
+
+  private boolean allFieldsFreeFor(DraggablePiece piece, DragEvent dragEvent) {
+    for (Tuple<Integer, Integer> t : getPositionsFor(piece, dragEvent)) {
+      if (fields[t.first][t.second] != null) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean allFieldsInGridFor(DraggablePiece piece, DragEvent dragEvent) {
+    double topLeftX = dragEvent.getX() - piece.getBoundsInParent().getWidth()/2;
+    double topLeftY = dragEvent.getY() - piece.getBoundsInParent().getHeight()/2;
+
+    for (Tuple<Double, Double> t : piece.getTransformedChildrenPosition()) {
+      if (!isInRange(topLeftX + t.first, topLeftY + t.second)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
 
   private DraggablePiece retrievePieceFrom(DragEvent dragEvent) {
     String pieceId = dragEvent.getDragboard().getString();
@@ -82,9 +118,27 @@ public class GameGrid extends Group {
     return gameBoard.getPieceFor(pieceId);
   }
 
+  private List<Tuple<Integer, Integer>> getPositionsFor(DraggablePiece piece, DragEvent dragEvent) {
+    return getPositionsFor(piece, dragEvent.getX(), dragEvent.getY());
+  }
+
+  private List<Tuple<Integer, Integer>> getPositionsFor(DraggablePiece piece, double centerX, double centerY) {
+    List<Tuple<Integer, Integer>> result = newArrayList();
+
+    double topLeftX = centerX - piece.getBoundsInParent().getWidth()/2;
+    double topLeftY = centerY - piece.getBoundsInParent().getHeight()/2;
+
+    for (Tuple<Double, Double> t : piece.getTransformedChildrenPosition()) {
+      result.add(getGridPositionFor(topLeftX + t.first, topLeftY + t.second));
+    }
+
+    return result;
+  }
+
   private List<Field> getFieldsFor(DraggablePiece piece, DragEvent dragEvent) {
     return getFieldsFor(piece, dragEvent.getX(), dragEvent.getY());
   }
+
 
   private List<Field> getFieldsFor(DraggablePiece piece, double centerX, double centerY) {
     List<Field> result = newArrayList();
@@ -95,7 +149,7 @@ public class GameGrid extends Group {
     List<Tuple<Double, Double>> childrenPosition = piece.getTransformedChildrenPosition();
 
     for (Tuple<Double, Double> t : childrenPosition) {
-      result.add(getFieldFor(topLeftX + t.first, topLeftY + t.second));
+      result.add(getBaseFieldFor(topLeftX + t.first, topLeftY + t.second));
     }
 
     return result;
@@ -124,7 +178,7 @@ public class GameGrid extends Group {
     return new Tuple<>(((int) (x / (FIELD_SIZE + SPACE))), ((int) (y / (FIELD_SIZE + SPACE))));
   }
 
-  public Field getFieldFor(double x, double y) {
+  public Field getBaseFieldFor(double x, double y) {
     if (isInRange(x, y)) {
       Tuple<Integer, Integer> position = getGridPositionFor(x, y);
       return baseFields[position.first][position.second];
@@ -143,5 +197,15 @@ public class GameGrid extends Group {
   private boolean isInVerticalRange(double y) {
     return 0 < y && y < columns * (FIELD_SIZE + SPACE);
   }
+
+  private void countPointsFor(DraggablePiece piece) {
+    gameBoard.count(piece.getPoints());
+  }
+
+  private void checkForCompleteRows() {
+    // TODO
+  }
+
+
 
 }

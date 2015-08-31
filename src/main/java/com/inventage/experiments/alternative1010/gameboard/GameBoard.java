@@ -3,9 +3,10 @@ package com.inventage.experiments.alternative1010.gameboard;
 import com.inventage.experiments.alternative1010.gameboard.nextblocks.NextBlockContainer;
 import com.inventage.experiments.alternative1010.gameboard.piece.DraggablePiece;
 import com.inventage.experiments.alternative1010.gameboard.piece.PieceLibrary;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.util.converter.NumberStringConverter;
 
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class GameBoard extends BorderPane {
   private static final String STYLE_SHEET_PATH = "styles.css";
 
   private BorderPane scorePane;
-  private SimpleStringProperty score = new SimpleStringProperty("0");
+  private SimpleIntegerProperty score = new SimpleIntegerProperty(0);
   private GameGrid gameGrid;
 
   private NextBlockContainer nextBlockContainer;
@@ -49,18 +50,14 @@ public class GameBoard extends BorderPane {
     setBottom(nextBlockContainer);
 
     for (int i = 0; i < 3; i++) {
-      DraggablePiece piece = pieceLibrary.nextRandomPiece();
-      pieces.put(piece.getPieceId(), piece);
-
-
-      nextBlockContainer.cycleIn(piece);
+      cycleItem();
     }
   }
 
   private Label createScoreLabel() {
     Label scoreLabel = new Label();
     scoreLabel.setId("score");
-    scoreLabel.textProperty().bind(score);
+    scoreLabel.textProperty().bindBidirectional(score, new NumberStringConverter());
     return scoreLabel;
   }
 
@@ -69,7 +66,17 @@ public class GameBoard extends BorderPane {
   }
 
   public void cycleItem() {
-    nextBlockContainer.cycleIn(pieceLibrary.nextRandomPiece());
+    DraggablePiece piece = pieceLibrary.nextRandomPiece();
+    pieces.put(piece.getPieceId(), piece);
+    nextBlockContainer.cycleIn(piece);
   }
 
+  public void dropItem(DraggablePiece piece) {
+    pieces.remove(piece.getId());
+    cycleItem();
+  }
+
+  public void count(Integer points) {
+    score.set(score.get() + points);
+  }
 }

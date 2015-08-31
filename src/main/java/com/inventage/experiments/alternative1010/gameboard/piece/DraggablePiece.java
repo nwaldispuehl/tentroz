@@ -4,26 +4,27 @@ import com.inventage.experiments.alternative1010.gameboard.Field;
 import com.inventage.experiments.alternative1010.gameboard.GameGrid;
 import com.inventage.experiments.alternative1010.gameboard.Tuple;
 import javafx.animation.ScaleTransition;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.input.*;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * A piece is a unique combination of fields to some geometric structure.
  */
-public abstract class DraggablePiece extends Group {
+public abstract class DraggablePiece extends Region {
 
   private static final int ROTATION_DEGREES = 90;
 
@@ -45,13 +46,50 @@ public abstract class DraggablePiece extends Group {
   protected void add(Field field) {
     getChildren().add(field);
     field.setColor(color);
+    recalculateSize();
   }
 
-  private Rotate rotate90Deg = new Rotate(90, 0, 0);
+  public Paint getColor() {
+    return color;
+  }
+
+  public Integer getPoints() {
+    return getFields().size();
+  }
+
+  private void recalculateSize() {
+    setMaxWidth(computePrefWidth(0));
+    setMaxHeight(computePrefHeight(0));
+  }
+
+  @Override
+  protected double computePrefWidth(double height) {
+    double largestX = 0;
+    for (Field f : getFields()) {
+      if (largestX <= f.getX()) {
+        largestX = f.getX();
+      }
+    }
+    return largestX + GameGrid.FIELD_SIZE;
+  }
+
+  @Override
+  protected double computePrefHeight(double width) {
+    double largestY = 0;
+    for (Field f : getFields()) {
+      if (largestY <= f.getY()) {
+        largestY = f.getY();
+      }
+    }
+    return largestY + GameGrid.FIELD_SIZE;
+  }
+
+  private Collection<Field> getFields() {
+    return getChildren().stream().map(n -> (Field) n).collect(Collectors.toList());
+  }
 
   public void rotate() {
-//    getTransforms().add(rotate90Deg);
-    getChildren().forEach(f -> f.getTransforms().add(rotate90Deg));
+    getTransforms().add(new Rotate(ROTATION_DEGREES, getBoundsInLocal().getWidth()/2, getBoundsInLocal().getHeight()/2));
     requestLayout();
   }
 
@@ -88,7 +126,7 @@ public abstract class DraggablePiece extends Group {
 
   public void setDraggable() {
     setOnDragDetected(event -> {
-      startFullDrag();
+//      startFullDrag();
       startDragAndDrop(TransferMode.MOVE);
 
       Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
@@ -96,42 +134,58 @@ public abstract class DraggablePiece extends Group {
       content.putString(getPieceId());
 
       SnapshotParameters params = new SnapshotParameters();
-      params.setFill(Color.color(1,1,1,0));
+      params.setFill(Color.color(1, 1, 1, 0));
       dragboard.setDragView(snapshot(params, null));
-      dragboard.setDragViewOffsetX(getBoundsInParent().getWidth()/2);
-      dragboard.setDragViewOffsetY(getBoundsInParent().getHeight()/2);
+      dragboard.setDragViewOffsetX(getBoundsInParent().getWidth() / 2);
+      dragboard.setDragViewOffsetY(getBoundsInParent().getHeight() / 2);
       dragboard.setContent(content);
       event.consume();
     });
-
   }
 
+  public void setRotatable() {
+    setOnMouseClicked(event -> rotate());
+  }
 
   public List<Tuple<Double,Double>> getTransformedChildrenPosition() {
-
-    // TODO: This unfortunately does not yet produce usable data...
-
-    double width = getBoundsInParent().getWidth();
-    double height = getBoundsInParent().getHeight();
-
     List<Tuple<Double,Double>> result = newArrayList();
 
-    for (Node n : getChildrenUnmodifiable()) {
-      Field f = (Field) n;
-
-      Point2D point2D = f.localToParent(f.getX(), f.getY());
-      double x = point2D.getX() ;
-      double y = point2D.getY() ;
-
-      Bounds bounds = f.getBoundsInParent();
-
-      System.out.println(x + " " + y);
-//      result.add(new Tuple<>(x + (bounds.getWidth() / 2), y + (bounds.getHeight() / 2)));
-      result.add(new Tuple<>(x , y));
+    for (Field f : getFields()) {
+      Point2D point2D = localToParent(f.getX(), f.getY());
+      result.add(new Tuple<>(point2D.getX(), point2D.getY()));
     }
+
+    normalize(result);
+    addHalfBlockSize(result);
+
     return result;
   }
 
+  private void normalize(List<Tuple<Double, Double>> positions) {
+    double minX = Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    for (Tuple<Double, Double> t : positions) {
+      if (t.first < minX) {
+        minX = t.first;
+      }
+      if (t.second < minY) {
+        minY = t.second;
+      }
+    }
+    for (Tuple<Double, Double> t : positions) {
+      t.first -= minX;
+      t.second -= minY;
+    }
+
+  }
+
+  private void addHalfBlockSize(List<Tuple<Double, Double>> positions) {
+    double halfGridSize = GRID_SIZE/2;
+    for (Tuple<Double, Double> t : positions) {
+      t.first += halfGridSize;
+      t.second += halfGridSize;
+    }
+  }
 
 
 }
