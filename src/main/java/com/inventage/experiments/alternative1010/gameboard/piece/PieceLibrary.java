@@ -12,11 +12,10 @@ import java.util.Random;
  */
 public class PieceLibrary implements PieceProvider {
 
-  private int[] rotationAngles = new int[] {0, 90, 180, 270};
-
   private List<Class<? extends DraggablePiece>> availablePieces = Lists.newArrayList();
 
   {
+    // Block
     availablePieces.add(SingleBlock.class);
 
     // Bars
@@ -46,22 +45,11 @@ public class PieceLibrary implements PieceProvider {
 
   @Override
   public DraggablePiece nextRandomPiece() {
-
-    DraggablePiece piece = null;
     try {
-      piece = getRandomPiece();
+      return getRandomPiece();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
-    int rotations = random.nextInt(rotationAngles.length);
-    for (int i = 0; i < rotations; i++) {
-      piece.rotate();
-    }
-
-    System.out.println(piece + "Rotations: " + rotationAngles[rotations]);
-
-    return piece;
   }
 
   private DraggablePiece getRandomPiece() throws Exception {

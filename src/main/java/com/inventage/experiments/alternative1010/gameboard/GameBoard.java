@@ -4,6 +4,8 @@ import com.inventage.experiments.alternative1010.gameboard.nextblocks.NextBlockC
 import com.inventage.experiments.alternative1010.gameboard.piece.DraggablePiece;
 import com.inventage.experiments.alternative1010.gameboard.piece.PieceLibrary;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.util.converter.NumberStringConverter;
@@ -13,7 +15,7 @@ import java.util.Map;
 import static com.google.common.collect.Maps.newHashMap;
 
 /**
- * Created by nw on 26.08.15.
+ * Game control.
  */
 public class GameBoard extends BorderPane {
 
@@ -21,6 +23,7 @@ public class GameBoard extends BorderPane {
 
   private BorderPane scorePane;
   private SimpleIntegerProperty score = new SimpleIntegerProperty(0);
+  private SimpleStringProperty information = new SimpleStringProperty();
   private GameGrid gameGrid;
 
   private NextBlockContainer nextBlockContainer;
@@ -28,6 +31,7 @@ public class GameBoard extends BorderPane {
   private PieceLibrary pieceLibrary = new PieceLibrary();
 
   private Map<String, DraggablePiece> pieces = newHashMap();
+  private DraggablePiece currentPiece;
 
   public GameBoard(double width, double height) {
     initializeGameBoardWith(width, height);
@@ -41,6 +45,7 @@ public class GameBoard extends BorderPane {
     scorePane = new BorderPane();
     scorePane.setPrefHeight(80);
     scorePane.setCenter(createScoreLabel());
+    scorePane.setRight(createInformationLabel());
     setTop(scorePane);
 
     gameGrid = new GameGrid(this, 10, 10);
@@ -50,9 +55,11 @@ public class GameBoard extends BorderPane {
     setBottom(nextBlockContainer);
 
     for (int i = 0; i < 3; i++) {
-      cycleItem();
+      cycleInNewRandomItem();
     }
   }
+
+
 
   private Label createScoreLabel() {
     Label scoreLabel = new Label();
@@ -61,22 +68,47 @@ public class GameBoard extends BorderPane {
     return scoreLabel;
   }
 
+  private Node createInformationLabel() {
+    Label informationLabel = new Label();
+    informationLabel.setId("information");
+    informationLabel.textProperty().bindBidirectional(information);
+    return informationLabel;
+  }
+
   public DraggablePiece getPieceFor(String pieceId) {
     return pieces.get(pieceId);
   }
 
-  public void cycleItem() {
-    DraggablePiece piece = pieceLibrary.nextRandomPiece();
-    pieces.put(piece.getPieceId(), piece);
-    nextBlockContainer.cycleIn(piece);
+  public void cycleInNewRandomItem() {
+    currentPiece = pieceLibrary.nextRandomPiece();
+    pieces.put(currentPiece.getPieceId(), currentPiece);
+    nextBlockContainer.cycleIn(currentPiece);
   }
 
   public void dropItem(DraggablePiece piece) {
-    pieces.remove(piece.getId());
-    cycleItem();
+    countPointsOf(piece);
+    removeFromList(piece);
+    cycleInNewRandomItem();
+    checkForFinishedGame();
+
+    // Update information
+    information.setValue("Children: " + gameGrid.getChildren().size());
   }
 
-  public void count(Integer points) {
+
+  private void countPointsOf(DraggablePiece piece) {
+    count(piece.getPoints());
+  }
+
+  private void count(Integer points) {
     score.set(score.get() + points);
+  }
+
+  private void removeFromList(DraggablePiece piece) {
+    pieces.remove(piece.getId());
+  }
+
+  private void checkForFinishedGame() {
+    // TODO
   }
 }

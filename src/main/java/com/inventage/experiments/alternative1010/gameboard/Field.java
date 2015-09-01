@@ -1,15 +1,14 @@
 package com.inventage.experiments.alternative1010.gameboard;
 
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+
+import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.GAMEGRID_PIECE_INACTIVE;
 
 /**
  * Models a single square field.
  */
 public class Field extends Rectangle {
-
-  public static final String DEFAULT_COLOR = "#dddddd";
 
   public Field(int size, int x, int y) {
     setX(x);
@@ -18,10 +17,11 @@ public class Field extends Rectangle {
     setHeight(size);
     setArcWidth(size/8);
     setArcHeight(size/8);
-    setFill(Color.web(DEFAULT_COLOR));
+    setFill(GAMEGRID_PIECE_INACTIVE);
   }
 
   public void setColor(Paint value) {
     setFill(value);
   }
+
 }

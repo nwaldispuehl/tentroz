@@ -3,6 +3,7 @@ package com.inventage.experiments.alternative1010.gameboard.piece;
 import com.inventage.experiments.alternative1010.gameboard.Field;
 import com.inventage.experiments.alternative1010.gameboard.GameGrid;
 import com.inventage.experiments.alternative1010.gameboard.Tuple;
+import javafx.animation.RotateTransition;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -11,7 +12,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 import java.util.Collection;
@@ -26,13 +26,15 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public abstract class DraggablePiece extends Region {
 
+  private static final int[] ROTATION_ANGLES = new int[] {0, 90, 180, 270};
   private static final int ROTATION_DEGREES = 90;
-
   protected static final int GRID_SIZE = GameGrid.FIELD_SIZE + GameGrid.SPACE;
 
-  private Paint color;
+  private static final double ROTATION_DURATION_MS = 100;
 
+  private Paint color;
   private UUID id;
+  private int currentRotationSetting = 1;
 
   protected DraggablePiece(Paint color) {
     this.color = color;
@@ -89,8 +91,15 @@ public abstract class DraggablePiece extends Region {
   }
 
   public void rotate() {
-    getTransforms().add(new Rotate(ROTATION_DEGREES, getBoundsInLocal().getWidth()/2, getBoundsInLocal().getHeight()/2));
+    RotateTransition t = new RotateTransition(Duration.millis(ROTATION_DURATION_MS), this);
+
+    t.setFromAngle(getRotate());
+    t.setToAngle(ROTATION_ANGLES[currentRotationSetting++ % ROTATION_ANGLES.length]);
+    t.play();
+
     requestLayout();
+
+
   }
 
 
@@ -99,7 +108,7 @@ public abstract class DraggablePiece extends Region {
   }
 
   private void animateToSmaller(Node n) {
-    ScaleTransition st = new ScaleTransition(Duration.millis(200), n);
+    ScaleTransition st = new ScaleTransition(Duration.millis(100), n);
     st.setFromX(1f);
     st.setFromY(1f);
 
@@ -132,15 +141,20 @@ public abstract class DraggablePiece extends Region {
       Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
       ClipboardContent content = new ClipboardContent();
       content.putString(getPieceId());
+      dragboard.setContent(content);
 
-      SnapshotParameters params = new SnapshotParameters();
-      params.setFill(Color.color(1, 1, 1, 0));
-      dragboard.setDragView(snapshot(params, null));
+      dragboard.setDragView(snapshot(getSnapshotParameters(), null));
       dragboard.setDragViewOffsetX(getBoundsInParent().getWidth() / 2);
       dragboard.setDragViewOffsetY(getBoundsInParent().getHeight() / 2);
-      dragboard.setContent(content);
+
       event.consume();
     });
+  }
+
+  private SnapshotParameters getSnapshotParameters() {
+    SnapshotParameters params = new SnapshotParameters();
+    params.setFill(Color.color(1, 1, 1, 0));
+    return params;
   }
 
   public void setRotatable() {

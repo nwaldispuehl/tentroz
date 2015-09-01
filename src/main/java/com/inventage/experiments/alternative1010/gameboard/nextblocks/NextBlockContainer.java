@@ -16,6 +16,7 @@ public class NextBlockContainer extends BorderPane {
   //---- Static
 
   private static final String CONTAINER_ID = "nextBlockPaneContainer";
+  private static final double PREFERRED_BOUNDING_BOX_SIZE = (GameGrid.FIELD_SIZE + GameGrid.SPACE) * 5 + 20;
 
   //---- Fields
 
@@ -34,13 +35,14 @@ public class NextBlockContainer extends BorderPane {
 
   private void initialize() {
     setId(CONTAINER_ID);
-    setPrefHeight((GameGrid.FIELD_SIZE + GameGrid.SPACE) * 5 + 20);
+    setPrefHeight(PREFERRED_BOUNDING_BOX_SIZE);
+    setPrefWidth(PREFERRED_BOUNDING_BOX_SIZE);
     setPadding(new Insets(10, 0, 0, 0));
   }
 
   private void addPieceContainer() {
     nextBlocksPane.alignmentProperty().setValue(Pos.CENTER);
-    nextBlocksPane.setSpacing(40);
+    nextBlocksPane.setSpacing(20);
     setCenter(nextBlocksPane);
   }
 
@@ -56,15 +58,19 @@ public class NextBlockContainer extends BorderPane {
   private BorderPane createPaneFor(DraggablePiece draggablePiece) {
     BorderPane borderPane = new BorderPane(draggablePiece);
     borderPane.requestLayout();
+    borderPane.setPadding(new Insets(5,5,5,5));
     HBox.setHgrow(borderPane, Priority.ALWAYS);
     return borderPane;
   }
 
   private void makeFirstItemDraggableAndRotatable() {
-    nextBlocksPane.getChildren().get(0).setOpacity(1);
-    DraggablePiece piece = (DraggablePiece) ((BorderPane) nextBlocksPane.getChildren().get(0)).getCenter();
+    BorderPane borderPane = (BorderPane) nextBlocksPane.getChildren().get(0);
+    DraggablePiece piece = (DraggablePiece) borderPane.getCenter();
+
+    borderPane.setOpacity(1);
+    borderPane.setOnMouseClicked(e -> piece.rotate());
+
     piece.setDraggable();
-    piece.setRotatable();
   }
 
   private void makeFollowingItemsTransparent() {
