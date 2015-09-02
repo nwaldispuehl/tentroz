@@ -3,6 +3,8 @@ package com.inventage.experiments.alternative1010.gameboard;
 import com.inventage.experiments.alternative1010.gameboard.nextblocks.NextBlockContainer;
 import com.inventage.experiments.alternative1010.gameboard.piece.DraggablePiece;
 import com.inventage.experiments.alternative1010.gameboard.piece.PieceLibrary;
+import com.inventage.experiments.alternative1010.gameboard.sound.ResourceUtil;
+import com.inventage.experiments.alternative1010.gameboard.sound.SoundManager;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Node;
@@ -10,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.util.converter.NumberStringConverter;
 
+import java.net.URL;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -20,6 +23,10 @@ import static com.google.common.collect.Maps.newHashMap;
 public class GameBoard extends BorderPane {
 
   private static final String STYLE_SHEET_PATH = "styles.css";
+
+  ResourceUtil resourceUtil = new ResourceUtil();
+  SoundManager soundManager = new SoundManager();
+  URL dropSound = resourceUtil.getUrlFrom("drop.aiff");
 
   private BorderPane scorePane;
   private SimpleIntegerProperty score = new SimpleIntegerProperty(0);
@@ -86,6 +93,7 @@ public class GameBoard extends BorderPane {
   }
 
   public void dropItem(DraggablePiece piece) {
+    soundManager.play(dropSound);
     countPointsOf(piece);
     removeFromList(piece);
     cycleInNewRandomItem();
