@@ -12,7 +12,7 @@ public class Field extends Rectangle {
 
   private boolean garbage = false;
 
-  public Field(int size, int x, int y) {
+  public Field(double size, double x, double y) {
     setX(x);
     setY(y);
     setWidth(size);

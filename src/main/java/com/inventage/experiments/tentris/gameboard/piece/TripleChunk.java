@@ -2,7 +2,6 @@ package com.inventage.experiments.tentris.gameboard.piece;
 
 import com.inventage.experiments.tentris.gameboard.Field;
 
-import static com.inventage.experiments.tentris.gameboard.GameGrid.FIELD_SIZE;
 import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.TRIPLE_CHUNK;
 
 /**
@@ -11,20 +10,20 @@ import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.TRI
 public class TripleChunk extends DraggablePiece {
 
   {
-    add(new Field(FIELD_SIZE, 0, 0));
-    add(new Field(FIELD_SIZE, 0, GRID_SIZE));
-    add(new Field(FIELD_SIZE, 0, 2 * GRID_SIZE));
+    add(new Field(getFieldSize(), 0, 0));
+    add(new Field(getFieldSize(), 0, getGridSize()));
+    add(new Field(getFieldSize(), 0, 2 * getGridSize()));
 
-    add(new Field(FIELD_SIZE, GRID_SIZE, 0));
-    add(new Field(FIELD_SIZE, GRID_SIZE, GRID_SIZE));
-    add(new Field(FIELD_SIZE, GRID_SIZE, 2 * GRID_SIZE));
+    add(new Field(getFieldSize(), getGridSize(), 0));
+    add(new Field(getFieldSize(), getGridSize(), getGridSize()));
+    add(new Field(getFieldSize(), getGridSize(), 2 * getGridSize()));
 
-    add(new Field(FIELD_SIZE, 2 * GRID_SIZE, 0));
-    add(new Field(FIELD_SIZE, 2 * GRID_SIZE, GRID_SIZE));
-    add(new Field(FIELD_SIZE, 2 * GRID_SIZE, 2 * GRID_SIZE));
+    add(new Field(getFieldSize(), 2 * getGridSize(), 0));
+    add(new Field(getFieldSize(), 2 * getGridSize(), getGridSize()));
+    add(new Field(getFieldSize(), 2 * getGridSize(), 2 * getGridSize()));
   }
 
-  public TripleChunk() {
-    super(TRIPLE_CHUNK);
+  public TripleChunk(Double fieldSize) {
+    super(fieldSize, TRIPLE_CHUNK);
   }
 }

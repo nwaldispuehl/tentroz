@@ -28,6 +28,9 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class GameBoard extends StackPane {
 
+  private static final int ROWS = 10;
+  private static final int COLUMNS = 10;
+
   private static final String STYLE_SHEET_PATH = "styles.css";
   private static final String SPECIAL_POINTS_ID = "specialPoints";
 
@@ -43,32 +46,37 @@ public class GameBoard extends StackPane {
 
   private NextBlockContainer nextBlockContainer;
 
-  private PieceLibrary pieceLibrary = new PieceLibrary();
+  private PieceLibrary pieceLibrary;
 
   private Map<String, DraggablePiece> pieces = newHashMap();
   private DraggablePiece currentPiece;
 
-  public GameBoard(double width, double height) {
-    initializeGameBoardWith(width, height);
-    setPrefWidth(width);
-    setPrefHeight(height);
+  public GameBoard(double fieldSize) {
+    pieceLibrary = new PieceLibrary(fieldSize);
+    initializeGameBoardWith(fieldSize);
+
+    // The width is roughly 16 x the field size.
+    setPrefWidth(COLUMNS * fieldSize + 6 * fieldSize);
+
+    // The height is roughly 21 x the field size.
+    setPrefHeight(ROWS * fieldSize + 3 * fieldSize + 8 * fieldSize);
   }
 
-  private void initializeGameBoardWith(double width, double height) {
+  private void initializeGameBoardWith(double fieldSize) {
     getStylesheets().add(getClass().getClassLoader().getResource(STYLE_SHEET_PATH).toExternalForm());
 
     backgroundPane = new BorderPane();
     getChildren().add(backgroundPane);
 
     scorePane = new BorderPane();
-    scorePane.setPrefHeight(80);
+    scorePane.setPrefHeight(3 * fieldSize);
     scorePane.setCenter(createScorePane());
     backgroundPane.setTop(scorePane);
 
-    gameGrid = new GameGrid(this, 10, 10);
+    gameGrid = new GameGrid(this, fieldSize, COLUMNS, ROWS);
     backgroundPane.setCenter(gameGrid);
 
-    nextBlockContainer = new NextBlockContainer(3);
+    nextBlockContainer = new NextBlockContainer(fieldSize, 3);
     backgroundPane.setBottom(nextBlockContainer);
 
     for (int i = 0; i < 3; i++) {

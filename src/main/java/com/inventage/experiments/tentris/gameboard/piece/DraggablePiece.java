@@ -24,17 +24,28 @@ public abstract class DraggablePiece extends Region {
 
   private static final int[] ROTATION_ANGLES = new int[] {0, 90, 180, 270};
   private static final int ROTATION_DEGREES = 90;
-  protected static final int GRID_SIZE = GameGrid.FIELD_SIZE + GameGrid.SPACE;
 
   private static final double ROTATION_DURATION_MS = 100;
 
+  private double fieldSize;
+  private double fieldSpace;
   private Paint color;
   private UUID id;
   private int currentRotationSetting = 1;
 
-  protected DraggablePiece(Paint color) {
+  protected DraggablePiece(double fieldSize, Paint color) {
+    this.fieldSize = fieldSize;
+    this.fieldSpace = fieldSize * GameGrid.FIELD_SPACE_FACTOR;
     this.color = color;
     id = UUID.randomUUID();
+  }
+
+  protected double getFieldSize() {
+    return fieldSize;
+  }
+
+  protected double getGridSize() {
+    return fieldSize + fieldSpace;
   }
 
   public String getPieceId() {
@@ -68,7 +79,7 @@ public abstract class DraggablePiece extends Region {
         largestX = f.getX();
       }
     }
-    return largestX + GameGrid.FIELD_SIZE;
+    return largestX + fieldSize;
   }
 
   @Override
@@ -79,7 +90,7 @@ public abstract class DraggablePiece extends Region {
         largestY = f.getY();
       }
     }
-    return largestY + GameGrid.FIELD_SIZE;
+    return largestY + fieldSize;
   }
 
   private Collection<Field> getFields() {
@@ -165,7 +176,7 @@ public abstract class DraggablePiece extends Region {
    * This moves the point into the center of the fields.
    */
   private void addHalfBlockSize(List<Tuple<Double, Double>> positions) {
-    double halfGridSize = GRID_SIZE/2;
+    double halfGridSize = getGridSize()/2;
     for (Tuple<Double, Double> t : positions) {
       t.first += halfGridSize;
       t.second += halfGridSize;

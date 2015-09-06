@@ -27,8 +27,10 @@ import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.GAM
  */
 public class GameGrid extends Group {
 
-  public static final int FIELD_SIZE = 56;
-  public static final int SPACE = 4;
+//  private static final int FIELD_SIZE = 30; // 56
+//  private static final int SPACE = 2; // 4
+
+  public static final double FIELD_SPACE_FACTOR = 0.1;
 
   private static final Duration GARBAGE_COLLECTION_PERIOD = Duration.seconds(10);
   private static final Duration CLEANING_SCALE_TRANSITION_DURATION = Duration.millis(200);
@@ -40,15 +42,28 @@ public class GameGrid extends Group {
 
   private GameBoard gameBoard;
 
+  private double fieldSize;
+  private double fieldSpace;
+
   private int columns;
   private int rows;
 
-  public GameGrid(GameBoard gameBoard, int columns, int rows) {
+  public GameGrid(GameBoard gameBoard, double fieldSize, int columns, int rows) {
     this.gameBoard = gameBoard;
+    this.fieldSize = fieldSize;
+    this.fieldSpace = fieldSize * FIELD_SPACE_FACTOR;
     this.columns = columns;
     this.rows = rows;
     initializeWith(columns, rows);
     registerDropListener();
+  }
+
+  public double fieldSize() {
+    return fieldSize;
+  }
+
+  public double fieldSpace() {
+    return fieldSpace;
   }
 
   private void initializeWith(int columns, int rows) {
@@ -57,7 +72,7 @@ public class GameGrid extends Group {
     fields = new Field[columns][rows];
     for (int i = 0; i < columns; i++) {
       for (int j = 0; j < rows; j++) {
-        Field f = new Field(FIELD_SIZE, i * (FIELD_SIZE + SPACE), j * (FIELD_SIZE + SPACE));
+        Field f = new Field(fieldSize, i * (fieldSize + fieldSpace), j * (fieldSize + fieldSpace));
         baseFields[i][j] = f;
         getChildren().add(f);
       }
@@ -66,13 +81,13 @@ public class GameGrid extends Group {
   }
 
   private void setBackgroundWith(int columns, int rows) {
-    Rectangle background = new Rectangle(columns * (FIELD_SIZE + SPACE) - SPACE, rows * (FIELD_SIZE + SPACE) - SPACE, GAMEGRID_BACKGROUND);
+    Rectangle background = new Rectangle(columns * (fieldSize + fieldSpace) - fieldSpace, rows * (fieldSize + fieldSpace) - fieldSpace, GAMEGRID_BACKGROUND);
     background.toBack();
     getChildren().add(background);
   }
 
   public Tuple<Integer, Integer> getGridPositionFor(double x, double y) {
-    return new Tuple<>(((int) (x / (FIELD_SIZE + SPACE))), ((int) (y / (FIELD_SIZE + SPACE))));
+    return new Tuple<>(((int) (x / (fieldSize + fieldSpace))), ((int) (y / (fieldSize + fieldSpace))));
   }
 
   private void registerDropListener() {
@@ -92,11 +107,14 @@ public class GameGrid extends Group {
 
     setOnDragDropped(event -> {
       DraggablePiece piece = retrievePieceFrom(event);
-      storeIntoFields(piece, event);
-      checkAndRemoveCompleteRowsWith(piece, event);
-      checkForEmptyField();
-      gameBoard.dropItem(piece, specialPoints.toArray(new SpecialPoint[0]));
-      specialPoints.clear();
+
+      if (allFieldsInGridFor(piece, event) && allFieldsFreeFor(piece, event)) {
+        storeIntoFields(piece, event);
+        checkAndRemoveCompleteRowsWith(piece, event);
+        checkForEmptyField();
+        gameBoard.dropItem(piece, specialPoints.toArray(new SpecialPoint[0]));
+        specialPoints.clear();
+      }
       event.consume();
     });
 
@@ -144,7 +162,7 @@ public class GameGrid extends Group {
   }
 
   private Field createFieldWith(Paint color, int col, int row) {
-    Field field = new Field(FIELD_SIZE, col * (FIELD_SIZE + SPACE), row * (FIELD_SIZE + SPACE));
+    Field field = new Field(fieldSize, col * (fieldSize + fieldSpace), row * (fieldSize + fieldSpace));
     field.setColor(color);
     return field;
   }
@@ -203,11 +221,11 @@ public class GameGrid extends Group {
   }
 
   private boolean isInHorizontalRange(double x) {
-    return 0 < x && x < rows * (FIELD_SIZE + SPACE);
+    return 0 < x && x < rows * (fieldSize + fieldSpace);
   }
 
   private boolean isInVerticalRange(double y) {
-    return 0 < y && y < columns * (FIELD_SIZE + SPACE);
+    return 0 < y && y < columns * (fieldSize + fieldSpace);
   }
 
   public void checkAndRemoveCompleteRowsWith(DraggablePiece piece, DragEvent dragEvent) {

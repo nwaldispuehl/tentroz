@@ -2,7 +2,6 @@ package com.inventage.experiments.tentris.gameboard.piece;
 
 import com.inventage.experiments.tentris.gameboard.Field;
 
-import static com.inventage.experiments.tentris.gameboard.GameGrid.FIELD_SIZE;
 import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.TRIPLE_ANGLE;
 
 /**
@@ -11,16 +10,16 @@ import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.TRI
 public class TripleAngle extends DraggablePiece {
 
   {
-    add(new Field(FIELD_SIZE, 0, 0));
+    add(new Field(getFieldSize(), 0, 0));
 
-    add(new Field(FIELD_SIZE, 0, GRID_SIZE));
-    add(new Field(FIELD_SIZE, 0, 2 * GRID_SIZE));
+    add(new Field(getFieldSize(), 0, getGridSize()));
+    add(new Field(getFieldSize(), 0, 2 * getGridSize()));
 
-    add(new Field(FIELD_SIZE, GRID_SIZE, 0));
-    add(new Field(FIELD_SIZE, 2 * GRID_SIZE, 0));
+    add(new Field(getFieldSize(), getGridSize(), 0));
+    add(new Field(getFieldSize(), 2 * getGridSize(), 0));
   }
 
-  public TripleAngle() {
-    super(TRIPLE_ANGLE);
+  public TripleAngle(Double fieldSize) {
+    super(fieldSize, TRIPLE_ANGLE);
   }
 }

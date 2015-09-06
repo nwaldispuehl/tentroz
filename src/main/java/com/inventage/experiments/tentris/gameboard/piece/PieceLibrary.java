@@ -13,6 +13,7 @@ import java.util.Random;
 public class PieceLibrary implements PieceProvider {
 
   private List<Class<? extends DraggablePiece>> availablePieces = Lists.newArrayList();
+  private double fieldSize;
 
   {
     // Block
@@ -35,11 +36,13 @@ public class PieceLibrary implements PieceProvider {
 
   Random random;
 
-  public PieceLibrary() {
+  public PieceLibrary(double fieldSize) {
+    this.fieldSize = fieldSize;
     random = new Random();
   }
 
-  public PieceLibrary(long seed) {
+  public PieceLibrary(double fieldSize, long seed) {
+    this.fieldSize = fieldSize;
     random = new Random(seed);
   }
 
@@ -59,7 +62,7 @@ public class PieceLibrary implements PieceProvider {
   }
 
   private DraggablePiece createInstanceOf(Class c) throws Exception {
-    Constructor<?> constructor = c.getConstructor();
-    return (DraggablePiece) constructor.newInstance();
+    Constructor<?> constructor = c.getConstructor(Double.class);
+    return (DraggablePiece) constructor.newInstance(fieldSize);
   }
 }

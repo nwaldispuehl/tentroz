@@ -2,7 +2,6 @@ package com.inventage.experiments.tentris.gameboard.piece;
 
 import com.inventage.experiments.tentris.gameboard.Field;
 
-import static com.inventage.experiments.tentris.gameboard.GameGrid.FIELD_SIZE;
 import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.DOUBLE_BAR;
 
 /**
@@ -11,11 +10,11 @@ import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.DOU
 public class DoubleBar extends DraggablePiece {
 
   {
-    add(new Field(FIELD_SIZE, 0, 0));
-    add(new Field(FIELD_SIZE, 0, GRID_SIZE));
+    add(new Field(getFieldSize(), 0, 0));
+    add(new Field(getFieldSize(), 0, getGridSize()));
   }
 
-  public DoubleBar() {
-    super(DOUBLE_BAR);
+  public DoubleBar(Double fieldSize) {
+    super(fieldSize, DOUBLE_BAR);
   }
 }

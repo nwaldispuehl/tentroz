@@ -2,7 +2,6 @@ package com.inventage.experiments.tentris.gameboard.piece;
 
 import com.inventage.experiments.tentris.gameboard.Field;
 
-import static com.inventage.experiments.tentris.gameboard.GameGrid.FIELD_SIZE;
 import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.DOUBLE_CHUNK;
 
 /**
@@ -11,13 +10,13 @@ import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.DOU
 public class DoubleChunk extends DraggablePiece {
 
   {
-    add(new Field(FIELD_SIZE, 0, 0));
-    add(new Field(FIELD_SIZE, 0, GRID_SIZE));
-    add(new Field(FIELD_SIZE, GRID_SIZE, 0));
-    add(new Field(FIELD_SIZE, GRID_SIZE, GRID_SIZE));
+    add(new Field(getFieldSize(), 0, 0));
+    add(new Field(getFieldSize(), 0, getGridSize()));
+    add(new Field(getFieldSize(), getGridSize(), 0));
+    add(new Field(getFieldSize(), getGridSize(), getGridSize()));
   }
 
-  public DoubleChunk() {
-    super(DOUBLE_CHUNK);
+  public DoubleChunk(Double fieldSize) {
+    super(fieldSize, DOUBLE_CHUNK);
   }
 }

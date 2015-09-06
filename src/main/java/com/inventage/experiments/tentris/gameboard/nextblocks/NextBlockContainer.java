@@ -16,17 +16,20 @@ public class NextBlockContainer extends BorderPane {
   //---- Static
 
   private static final String CONTAINER_ID = "nextBlockPaneContainer";
-  private static final double PREFERRED_BOUNDING_BOX_SIZE = (GameGrid.FIELD_SIZE + GameGrid.SPACE) * 5 + 20;
+//  private static final double PREFERRED_BOUNDING_BOX_SIZE = (GameGrid.FIELD_SIZE + GameGrid.SPACE) * 5 + 20;
 
   //---- Fields
 
   private HBox nextBlocksPane = new HBox();
+  private double fieldSize;
   private int slots;
 
   //---- Constructor
 
-  public NextBlockContainer(int slots) {
+  public NextBlockContainer(double fieldSize, int slots) {
+    this.fieldSize = fieldSize;
     this.slots = slots;
+
     initialize();
     addPieceContainer();
   }
@@ -35,8 +38,10 @@ public class NextBlockContainer extends BorderPane {
 
   private void initialize() {
     setId(CONTAINER_ID);
-    setPrefHeight(PREFERRED_BOUNDING_BOX_SIZE);
-    setPrefWidth(PREFERRED_BOUNDING_BOX_SIZE);
+
+    double preferredSize = (fieldSize + (fieldSize * GameGrid.FIELD_SPACE_FACTOR)) * 5 + 20;
+    setPrefHeight(preferredSize);
+    setPrefWidth(preferredSize);
     setPadding(new Insets(10, 0, 0, 0));
   }
 
