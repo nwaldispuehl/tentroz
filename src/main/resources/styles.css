@@ -3,9 +3,20 @@
     /*-fx-border-color:dodgerblue;*/
 }
 
-#score {
+@font-face {
+    src: url("AmericanTypewriter.ttf");
+}
+
+#scorePane {
     -fx-font-size: 42;
+}
+
+#score {
     -fx-font-weight: bolder;
+}
+
+#highScore {
+    -fx-text-fill: #a40000;
 }
 
 #nextBlockPaneContainer {
@@ -14,4 +25,9 @@
 
 #nextBlockPane {
 
+}
+
+#specialPoints {
+    -fx-font: condensed bold 120 "American Typewriter";
+    -fx-fill: linear-gradient(from 0% 0% to 100% 200%, repeat, orange 0%, red 50%);
 }

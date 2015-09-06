@@ -1,10 +1,9 @@
-package com.inventage.experiments.alternative1010.gameboard.piece;
+package com.inventage.experiments.tentris.gameboard.piece;
 
-import com.inventage.experiments.alternative1010.gameboard.Field;
-import com.inventage.experiments.alternative1010.gameboard.GameGrid;
-import com.inventage.experiments.alternative1010.gameboard.Tuple;
+import com.inventage.experiments.tentris.gameboard.Field;
+import com.inventage.experiments.tentris.gameboard.GameGrid;
+import com.inventage.experiments.tentris.gameboard.Tuple;
 import javafx.animation.RotateTransition;
-import javafx.animation.ScaleTransition;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -14,10 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -87,7 +83,12 @@ public abstract class DraggablePiece extends Region {
   }
 
   private Collection<Field> getFields() {
-    return getChildren().stream().map(n -> (Field) n).collect(Collectors.toList());
+    Collection<Field> result = new ArrayList<>();
+    for (Node n : getChildren()) {
+      result.add((Field) n);
+    }
+
+    return result;
   }
 
   public void rotate() {
@@ -98,39 +99,6 @@ public abstract class DraggablePiece extends Region {
     t.play();
 
     requestLayout();
-
-
-  }
-
-
-  public void animateToSmaller() {
-    getChildren().forEach(n -> animateToSmaller(n));
-  }
-
-  private void animateToSmaller(Node n) {
-    ScaleTransition st = new ScaleTransition(Duration.millis(100), n);
-    st.setFromX(1f);
-    st.setFromY(1f);
-
-    st.setToX(0.9f);
-    st.setToY(0.9f);
-
-    st.play();
-  }
-
-  public void animateToNormal() {
-    getChildren().forEach(n -> animateToNormal(n));
-  }
-
-  private void animateToNormal(Node n) {
-    ScaleTransition st = new ScaleTransition(Duration.millis(200), n);
-    st.setFromX(0.9f);
-    st.setFromY(0.9f);
-
-    st.setToX(1f);
-    st.setToY(1f);
-
-    st.play();
   }
 
   public void setDraggable() {
@@ -193,6 +161,9 @@ public abstract class DraggablePiece extends Region {
 
   }
 
+  /**
+   * This moves the point into the center of the fields.
+   */
   private void addHalfBlockSize(List<Tuple<Double, Double>> positions) {
     double halfGridSize = GRID_SIZE/2;
     for (Tuple<Double, Double> t : positions) {

@@ -1,4 +1,4 @@
-package com.inventage.experiments.alternative1010.gameboard.sound;
+package com.inventage.experiments.tentris.gameboard.sound;
 
 import java.net.URL;
 

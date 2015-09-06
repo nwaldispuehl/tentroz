@@ -1,4 +1,4 @@
-package com.inventage.experiments.alternative1010.gameboard.piece;
+package com.inventage.experiments.tentris.gameboard.piece;
 
 import javafx.scene.paint.Color;
 

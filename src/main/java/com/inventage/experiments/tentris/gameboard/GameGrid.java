@@ -1,10 +1,13 @@
-package com.inventage.experiments.alternative1010.gameboard;
+package com.inventage.experiments.tentris.gameboard;
 
 import com.google.common.collect.Maps;
-import com.inventage.experiments.alternative1010.gameboard.piece.DraggablePiece;
+import com.inventage.experiments.tentris.gameboard.piece.DraggablePiece;
 import javafx.animation.ScaleTransition;
+import javafx.application.Platform;
+import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Paint;
@@ -15,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.GAMEGRID_BACKGROUND;
-import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.GAMEGRID_PIECE_ACTIVE;
-import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.GAMEGRID_PIECE_INACTIVE;
+import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.GAMEGRID_BACKGROUND;
+import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.GAMEGRID_PIECE_ACTIVE;
+import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.GAMEGRID_PIECE_INACTIVE;
 
 /**
  * The game grid maintains the grid and the state of its items.
@@ -27,10 +30,13 @@ public class GameGrid extends Group {
   public static final int FIELD_SIZE = 56;
   public static final int SPACE = 4;
 
-  private static final double CLEANING_SCALE_TRANSITION_DURATION_MS = 200;
+  private static final Duration GARBAGE_COLLECTION_PERIOD = Duration.seconds(10);
+  private static final Duration CLEANING_SCALE_TRANSITION_DURATION = Duration.millis(200);
 
   private Field[][] baseFields;
   private Field[][] fields;
+
+  private List<SpecialPoint> specialPoints = newArrayList();
 
   private GameBoard gameBoard;
 
@@ -56,6 +62,7 @@ public class GameGrid extends Group {
         getChildren().add(f);
       }
     }
+    startGarbageCollection();
   }
 
   private void setBackgroundWith(int columns, int rows) {
@@ -70,9 +77,7 @@ public class GameGrid extends Group {
 
   private void registerDropListener() {
 
-    setOnDragExited(event -> {
-      clearDropTarget();
-    });
+    setOnDragExited(event -> clearDropTarget());
 
     setOnDragOver(event -> {
       clearDropTarget();
@@ -82,21 +87,37 @@ public class GameGrid extends Group {
         event.acceptTransferModes(TransferMode.MOVE);
         markDropTargetOf(piece, event);
       }
-
       event.consume();
     });
 
     setOnDragDropped(event -> {
       DraggablePiece piece = retrievePieceFrom(event);
       storeIntoFields(piece, event);
-      gameBoard.dropItem(piece);
       checkAndRemoveCompleteRowsWith(piece, event);
+      checkForEmptyField();
+      gameBoard.dropItem(piece, specialPoints.toArray(new SpecialPoint[0]));
+      specialPoints.clear();
+      event.consume();
     });
 
-    setOnMouseDragOver(event -> {
-      event.consume();
-      System.out.println("mouse over");
-    });
+    setOnMouseDragOver(event -> event.consume());
+  }
+
+  private void checkForEmptyField() {
+    if (isFieldEmpty()) {
+      specialPoints.add(SpecialPoint.COMPLETELY_EMPTY);
+    }
+  }
+
+  private boolean isFieldEmpty() {
+    for (int i = 0; i < fields.length; i++) {
+      for (int j = 0; j < fields[i].length; j++) {
+        if (fields[i][j] != null) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private void markDropTargetOf(DraggablePiece piece, DragEvent dragEvent) {
@@ -177,36 +198,6 @@ public class GameGrid extends Group {
     return result;
   }
 
-  private List<Field> getFieldsFor(DraggablePiece piece, DragEvent dragEvent) {
-    return getFieldsFor(piece, dragEvent.getX(), dragEvent.getY());
-  }
-
-
-  private List<Field> getFieldsFor(DraggablePiece piece, double centerX, double centerY) {
-    List<Field> result = newArrayList();
-
-    double topLeftX = centerX - piece.getBoundsInParent().getWidth()/2;
-    double topLeftY = centerY - piece.getBoundsInParent().getHeight()/2;
-
-    List<Tuple<Double, Double>> childrenPosition = piece.getTransformedChildrenPosition();
-
-    for (Tuple<Double, Double> t : childrenPosition) {
-      result.add(getBaseFieldFor(topLeftX + t.first, topLeftY + t.second));
-    }
-
-    return result;
-  }
-
-
-
-  public Field getBaseFieldFor(double x, double y) {
-    if (isInRange(x, y)) {
-      Tuple<Integer, Integer> position = getGridPositionFor(x, y);
-      return baseFields[position.first][position.second];
-    }
-    return null;
-  }
-
   private boolean isInRange(double x, double y) {
     return isInHorizontalRange(x) && isInVerticalRange(y);
   }
@@ -233,6 +224,8 @@ public class GameGrid extends Group {
       }
     }
 
+    checkForSpecialPointsIn(rowsToClean, colsToClean);
+
     for (Map.Entry<Integer, Integer> e : rowsToClean.entrySet()) {
       cleanRowStartingFrom(e.getKey(), e.getValue());
     }
@@ -241,6 +234,15 @@ public class GameGrid extends Group {
       cleanColumnStartingFrom(e.getKey(), e.getValue());
     }
 
+  }
+
+  private void checkForSpecialPointsIn(Map<Integer, Integer> rowsToClean, Map<Integer, Integer> colsToClean) {
+    if (1 < rowsToClean.size()) {
+      specialPoints.add(SpecialPoint.getForRows(rowsToClean.size()));
+    }
+    if (1 < colsToClean.size()) {
+      specialPoints.add(SpecialPoint.getForRows(colsToClean.size()));
+    }
   }
 
   private void cleanRowStartingFrom(int row, int startFromCol) {
@@ -269,40 +271,8 @@ public class GameGrid extends Group {
     final Field field = fields[column][row];
     if (field != null) {
       fields[column][row] = null;
-
-      new Task<Object>(){
-        @Override
-        protected Object call() throws Exception {
-          if (field != null) {
-
-            ScaleTransition st = new ScaleTransition(Duration.millis(CLEANING_SCALE_TRANSITION_DURATION_MS), field);
-            st.setFromX(1);
-            st.setFromY(1);
-            st.setToX(0);
-            st.setToY(0);
-            st.play();
-
-
-
-            // TODO: Children are not removed. Why?
-//            GameGrid.this.getChildren().remove(field);
-
-//            ScheduledService<Object> svc = new ScheduledService<Object>() {
-//              protected Task<Object> createTask() {
-//                return new Task<Object>() {
-//                  protected Object call() {
-//                    GameGrid.this.getChildren().remove(field);
-//                    return null;
-//                  }
-//                };
-//              }
-//            };
-//            svc.setDelay(Duration.millis(CLEANING_SCALE_TRANSITION_DURATION_MS));
-//            svc.start();
-          }
-          return null;
-        }
-      }.run();
+      field.markAsGarbage();
+      scheduleMinimizingTransitionTaskFor(field);
     }
   }
 
@@ -324,6 +294,47 @@ public class GameGrid extends Group {
     return true;
   }
 
+  private void scheduleMinimizingTransitionTaskFor(final Field field) {
+    new Task<Object>(){
+      @Override
+      protected Object call() throws Exception {
+        if (field != null) {
+          ScaleTransition st = new ScaleTransition(CLEANING_SCALE_TRANSITION_DURATION, field);
+          st.setFromX(1);
+          st.setFromY(1);
+          st.setToX(0);
+          st.setToY(0);
+          st.play();
+        }
+        return null;
+      }
+    }.run();
+  }
 
+
+  private synchronized void startGarbageCollection() {
+      Platform.setImplicitExit(false);
+      ScheduledService<Object> svc = new ScheduledService<Object>() {
+        protected Task<Object> createTask() {
+          return new Task<Object>() {
+            protected Object call() {
+              Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                  for (Node n : newArrayList(getChildren())) {
+                    if (n instanceof Field && ((Field) n).isGarbage()) {
+                      getChildren().remove(n);
+                    }
+                  }
+                }
+              });
+              return null;
+            }
+          };
+        }
+      };
+      svc.setPeriod(GARBAGE_COLLECTION_PERIOD);
+      svc.start();
+  }
 
 }

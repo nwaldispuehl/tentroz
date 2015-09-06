@@ -1,9 +1,9 @@
-package com.inventage.experiments.alternative1010.gameboard.piece;
+package com.inventage.experiments.tentris.gameboard.piece;
 
-import com.inventage.experiments.alternative1010.gameboard.Field;
+import com.inventage.experiments.tentris.gameboard.Field;
 
-import static com.inventage.experiments.alternative1010.gameboard.GameGrid.FIELD_SIZE;
-import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.TRIPLE_ANGLE;
+import static com.inventage.experiments.tentris.gameboard.GameGrid.FIELD_SIZE;
+import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.TRIPLE_ANGLE;
 
 /**
  * Angled piece with legs of length 2.

@@ -1,7 +1,7 @@
-package com.inventage.experiments.alternative1010.gameboard.nextblocks;
+package com.inventage.experiments.tentris.gameboard.nextblocks;
 
-import com.inventage.experiments.alternative1010.gameboard.GameGrid;
-import com.inventage.experiments.alternative1010.gameboard.piece.DraggablePiece;
+import com.inventage.experiments.tentris.gameboard.GameGrid;
+import com.inventage.experiments.tentris.gameboard.piece.DraggablePiece;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;

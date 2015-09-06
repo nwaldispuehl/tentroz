@@ -1,14 +1,16 @@
-package com.inventage.experiments.alternative1010.gameboard;
+package com.inventage.experiments.tentris.gameboard;
 
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-import static com.inventage.experiments.alternative1010.gameboard.piece.ColorPalette.GAMEGRID_PIECE_INACTIVE;
+import static com.inventage.experiments.tentris.gameboard.piece.ColorPalette.GAMEGRID_PIECE_INACTIVE;
 
 /**
  * Models a single square field.
  */
 public class Field extends Rectangle {
+
+  private boolean garbage = false;
 
   public Field(int size, int x, int y) {
     setX(x);
@@ -24,4 +26,11 @@ public class Field extends Rectangle {
     setFill(value);
   }
 
+  public void markAsGarbage() {
+    garbage = true;
+  }
+
+  public boolean isGarbage() {
+    return garbage;
+  }
 }

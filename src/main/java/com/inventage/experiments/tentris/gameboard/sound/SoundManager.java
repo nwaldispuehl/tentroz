@@ -1,10 +1,11 @@
-package com.inventage.experiments.alternative1010.gameboard.sound;
+package com.inventage.experiments.tentris.gameboard.sound;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 
+import static com.google.common.collect.Sets.newConcurrentHashSet;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -12,7 +13,7 @@ import static com.google.common.collect.Sets.newHashSet;
  */
 public class SoundManager {
 
-  private Collection<Clip> clips = newHashSet();
+  private Collection<Clip> clips = newConcurrentHashSet();
 
   private static final int sleepTimeMillis = 50;
 
