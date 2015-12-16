@@ -29,7 +29,6 @@ buildscript {
     }
 }
 
-
 jfxmobile {
     ios {
         forceLinkClasses = ['ensemble.**.*']
