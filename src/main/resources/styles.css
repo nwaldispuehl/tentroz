@@ -7,8 +7,28 @@
     src: url("AmericanTypewriter.ttf");
 }
 
+#titleImage {
+
+}
+
+#applicationTitle {
+    -fx-font-family: 'AmericanTypewriter';
+    -fx-font-size: 52;
+    -fx-font-weight: bold;
+    -fx-text-fill: red;
+}
+
+#applicationSubTitle {
+    -fx-font-size: 18;
+    -fx-font-style: italic;
+}
+
+#startButton {
+    -fx-font-size: 26;
+}
+
 #scorePane {
-    -fx-font-size: 42;
+    -fx-font-size: 36;
 }
 
 #score {

@@ -7,14 +7,23 @@ repositories {
     jcenter()
 }
 
-mainClassName = "com.inventage.experiments.tentris.TenTris"
+mainClassName = "ch.retorte.tentroz.TenTroz"
 
 jar {
     manifest.attributes provider: 'gradle'
 }
 
+ext.CHARM_DOWN_VERSION = "0.0.2"
+
 dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '15.0'
+
+    compile "com.gluonhq:charm-down-common:$CHARM_DOWN_VERSION"
+    desktopRuntime "com.gluonhq:charm-down-desktop:$CHARM_DOWN_VERSION"
+    androidRuntime "com.gluonhq:charm-down-android:$CHARM_DOWN_VERSION"
+    iosCompile "org.robovm:robovm-cocoatouch:1.0.0"
+    iosRuntime "com.gluonhq:charm-down-ios:$CHARM_DOWN_VERSION"
+
     testCompile 'org.mockito:mockito-all:1.9.5'
     testCompile 'junit:junit:4.11'
 }
@@ -25,15 +34,17 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.javafxports:jfxmobile-plugin:1.0.0-b10'
+        classpath 'org.javafxports:jfxmobile-plugin:1.0.7'
     }
 }
 
 jfxmobile {
     ios {
-        forceLinkClasses = ['ensemble.**.*']
+        forceLinkClasses = ['ch.retorte.tentroz.**.*', 'com.gluonhq.charm.down.**.*' ]
     }
     android {
-        applicationPackage = 'org.javafxports.ensemble'
+        applicationPackage = 'ch.retorte.tentroz'
+        resDirectory = 'src/android/resources'
+        manifest = 'src/android/AndroidManifest.xml'
     }
 }
