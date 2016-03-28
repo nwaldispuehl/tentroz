@@ -393,12 +393,12 @@ public class GameGrid extends Group {
         for (int j = 0; j < fields[i].length; j++) {
 
           for (int r = 0; r < 4; r++) {
+            inspectedPiece.setRotate(r * 90);
             if (allFieldsInGridForBoard(inspectedPiece, i, j)) {
               if (allFieldsFreeForBoard(inspectedPiece, i, j)) {
                 return true;
               }
             }
-            inspectedPiece.rotate();
           }
 
         }
