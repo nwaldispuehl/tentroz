@@ -95,6 +95,7 @@ public class TenTroz extends Application {
     registerExitListenerIn(mainScene);
 
     if (isTouchEnabled()) {
+      // TODO: Does this make the drag/drop preview vanish?
       mainScene.setCursor(Cursor.NONE);
     }
 
